@@ -108,17 +108,6 @@ function freight(){
 }
 
 function rabett(){
-  if(window.rabet){
-    
-    return;
-  }
-  else{
-    return;
-    
-  }
-}
-
-function rabett(){
   if (!window.rabet) {
     alert("Rabet not found, Please Install Rabet First");
   }
