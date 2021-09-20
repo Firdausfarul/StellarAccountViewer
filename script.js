@@ -1,20 +1,11 @@
-var address;
-var firsttx;
+var address; //storing the address or public key
+var firsttx; //storing txid for createAccount transaction(first tx, to know the account creator)
 
-function bobo(){
-  if (window.freighterApi.isConnected()) {
-    alert("User has Freighter!");
-  }   
-  else{
-    alert("Gak onok cok asu")
-  }
-}
+//fetching public key from freighter
 const retrievePublicKey = async () => {
   let error = "";
   try {
     publicKey = await window.freighterApi.getPublicKey();
-    kntl=publicKey;
-    console.log(kntl);
   } 
   catch (e) {
     error = e;
@@ -23,47 +14,69 @@ const retrievePublicKey = async () => {
   if (error) {
     return error;
   }
-  //console.log(typeof(publicKey))
-  mumu(publicKey);
+  mumu(publicKey); //storing fetched publickey to address
   return publicKey;
 };
+
+//storing fetched publickey to address
 function mumu(pk){
   address = pk;
-  console.log(pk);
+  var kon = document.createElement('P'); //printing the address
+  kon.innerHTML = "Address : " + pk; 
+  document.body.appendChild(kon);
+  balances(address); 
 }
-function reqbalances(pubkey){
+//fetching and printing balance for the corresponding public key
+function balances(pubkey){
   const xhr = new XMLHttpRequest();
   const url= "https://horizon.stellar.org/accounts/";
-  xhr.open('GET', url+pubkey);
+  xhr.open('GET', url+pubkey); //fetching from horizon API
   xhr.onreadystatechange = function () {
     if(xhr.readyState === XMLHttpRequest.DONE) {
         var toad = JSON.parse(xhr.responseText);
-        for(i=0;i<toad.balances.length;i++){ 
-          console.log(toad.balances[i].balance + "" + toad.balances[i].asset_code);
+        var kon = document.createElement('P');
+        kon.innerHTML = "Balances : "; 
+        document.body.appendChild(kon);
+        for(i=0;i<toad.balances.length;i++){
+            var kon = document.createElement('P');
+            if(toad.balances[i].asset_code === undefined){ 
+              kon.innerHTML = toad.balances[i].balance + " " + "XLM"; 
+              document.body.appendChild(kon);
+            }
+            else{ 
+              kon.innerHTML = toad.balances[i].balance + " " + toad.balances[i].asset_code; 
+              document.body.appendChild(kon);
+            }
         }
+        time_create(address);
   }
 };
 xhr.send();
 }
-function reqtime_create(pubKey){
+
+//fetching and printing cretion time for the corresponding public key
+function time_create(pubKey){
   const url= "https://horizon.stellar.org/accounts/";
   const xhr = new XMLHttpRequest();
-  xhr.open('GET', url+pubKey+"/transactions?order=asc");
+  xhr.open('GET', url+pubKey+"/transactions?order=asc");//fetching from horizon API
   xhr.onreadystatechange = function () {
     if(xhr.readyState === XMLHttpRequest.DONE) {
         var toadz = JSON.parse(xhr.responseText); 
         firsttx = toadz._embedded.records[0].hash;
-        console.log(toadz._embedded.records[0].hash);//for account creator
-        console.log("created at : "+toadz._embedded.records[0].created_at);
+        var kon = document.createElement('P');
+        kon.innerHTML = "created at : "+ toadz._embedded.records[0].created_at; 
+        document.body.appendChild(kon);
+        created_by(firsttx);
   }
 };
 xhr.send();
 }
+
+//fetching and printing account creator for the corresponding public key
 function created_by(txid){
   const xhr = new XMLHttpRequest();
-  xhr.open('GET', "https://horizon.stellar.org/transactions/"+ txid +"/operations");
+  xhr.open('GET', "https://horizon.stellar.org/transactions/"+ txid +"/operations");//fetching from horizon API
   xhr.onreadystatechange = function () {
-  // In local files, status is 0 upon success in Mozilla Firefox
   if(xhr.readyState === XMLHttpRequest.DONE) {
       console.log(txid);
       var toadz = JSON.parse(xhr.responseText); 
@@ -72,7 +85,9 @@ function created_by(txid){
       for(i=0;i<pjg;i++){
         if(toadz._embedded.records[i].type == "create_account"){
             if(toadz._embedded.records[i].account == address){
-                console.log(toadz._embedded.records[i].funder);
+                var kon = document.createElement('P');
+                kon.innerHTML = "Created By : " + toadz._embedded.records[i].funder; 
+                document.body.appendChild(kon);
                 break;
             }
         }
@@ -80,5 +95,35 @@ function created_by(txid){
   }
 };
 xhr.send();
+}
 
+function freight(){
+    if (window.freighterApi.isConnected()) {
+    hidd(); //erasing login button
+    retrievePublicKey();
+    }
+    else{
+    alert("Freighter not found, Please Install Freighter First");
+  }
+}
+
+function rabet(){
+  if(window.rabet){
+    hidd(); //erasing login button
+    rabet.connect()
+    .then(result => mumu(result.publicKey))
+    .catch(error => console.error(`Error: ${error}`));
+  }
+  else{
+    alert("Rabet not found, Please Install Rabet First");
+    return;
+  }
+}
+
+//erasing login button
+function hidd(){
+  var button=document.getElementById('rabet');
+  button.style.display="none";
+  var button=document.getElementById('freighter');
+  button.style.display="none";
 }
