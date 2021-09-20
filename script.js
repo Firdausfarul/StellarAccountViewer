@@ -107,22 +107,33 @@ function freight(){
   }
 }
 
-function rabet(){
+function rabett(){
   if(window.rabet){
+    
+    return;
+  }
+  else{
+    return;
+    
+  }
+}
+
+function rabett(){
+  if (!window.rabet) {
+    alert("Rabet not found, Please Install Rabet First");
+  }
+  else{
     hidd(); //erasing login button
+    console.log(1000);
     rabet.connect()
     .then(result => mumu(result.publicKey))
     .catch(error => console.error(`Error: ${error}`));
-  }
-  else{
-    alert("Rabet not found, Please Install Rabet First");
-    return;
   }
 }
 
 //erasing login button
 function hidd(){
-  var button=document.getElementById('rabet');
+  var button=document.getElementById('rabeto');
   button.style.display="none";
   var button=document.getElementById('freighter');
   button.style.display="none";
